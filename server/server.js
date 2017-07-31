@@ -1,7 +1,10 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
 
-var mongoose = require('./db/mongoose.js').mongoose;
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost:27017/TodoApp');
+
 var Todo = mongoose.model('Todo', {
   text: {
     type: String,
@@ -18,8 +21,14 @@ var Todo = mongoose.model('Todo', {
     default: null
   }
 });
-var User = require('./models/user.js');
-
+var User = mongoose.model('User', {
+  email: {
+    type: String,
+    required: true,
+    minlength: 1,
+    trim: true
+  }
+});
 var app = express();
 
 app.use(bodyParser.json());
@@ -33,6 +42,14 @@ app.post('/todos',(req,res) => {
    }, (e) => {
      res.status(400).send(e);
    });
+});
+
+app.get('/todos',(req,res) => {
+  Todo.find().then((todos) => {
+    res.send(todos);
+  }, (e) => {
+    res.status(400).send(e);
+  })
 });
 
 app.listen(3000, () => {
