@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "./server/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha server/**/*.test.js"
   },
   "engines": {
     "node": "8.2.1"
@@ -25,4 +25,3 @@
     "nodemon": "^1.11.0",
     "supertest": "^3.0.0"
   }
-}
