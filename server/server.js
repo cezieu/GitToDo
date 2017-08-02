@@ -7,10 +7,10 @@ if (env === 'development') {
   process.env.PORT = 3000;
   process.env.MONGODB_URI = 'mongodb://localhost:27017/TodoAppTest';
 }
-
-
+var {User} = require('./models/user.js');
+var {Todo} = require('./models/todo.js');
 const express = require('express');
-const _ = require('lodash')
+const _ = require('lodash');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const ObjectID = require('mongodb').ObjectID;
@@ -18,30 +18,6 @@ const ObjectID = require('mongodb').ObjectID;
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI);
 
-var Todo = mongoose.model('Todo', {
-  text: {
-    type: String,
-    required: true,
-    minlength: 1,
-    trim: true
-  },
-  completed: {
-    type: Boolean,
-    default: false
-  },
-  completedAt: {
-    type: Number,
-    default: null
-  }
-});
-var User = mongoose.model('User', {
-  email: {
-    type: String,
-    required: true,
-    minlength: 1,
-    trim: true
-  }
-});
 var app = express();
 const port = process.env.PORT || 3000;
 
@@ -121,6 +97,19 @@ app.patch('/todos/:id',(req,res) => {
     res.status(400).send(e);
   })
 });
+
+app.post('/users',(req,res) => {
+   var body = _.pick(req.body,['email','password']);
+   var user = new User(body);
+   user.save().then(() => {
+     return user.generateAuthToken();
+   }).then((token) => {
+        res.header('x-auth', token).send(user);
+      }).catch((e) => {
+        res.status(400).send(e);
+    })
+});
+
 app.listen(port, () => {
   console.log(`Started on port ${port}`);
 });
