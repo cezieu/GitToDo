@@ -7,6 +7,7 @@ if (env === 'development') {
   process.env.PORT = 3000;
   process.env.MONGODB_URI = 'mongodb://localhost:27017/TodoAppTest';
 }
+var {authenticate} = require('./middleware/authenticate');
 var {User} = require('./models/user.js');
 var {Todo} = require('./models/todo.js');
 const express = require('express');
@@ -108,6 +109,11 @@ app.post('/users',(req,res) => {
       }).catch((e) => {
         res.status(400).send(e);
     })
+});
+
+
+app.get('/users/me',authenticate,(req,res) => {
+    res.send(req.user);
 });
 
 app.listen(port, () => {
